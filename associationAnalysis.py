@@ -1,6 +1,6 @@
 # association analysis homework
 import re
-
+import itertools
 
 def read(file_path):
     file_object = open(file_path, "r")
@@ -25,7 +25,7 @@ def frequent(database, min_support, candidate_Ck, k):
             frequent_Lk.append(candidate)
         cnt = 0
 
-    print("found " + str(len(frequent_Lk)) + " frequent itemsets with length k = "+str(k))
+    print("number of length-" + str(k) + " frequent itemsets:"+str(len(frequent_Lk)))
     return frequent_Lk
 
 
@@ -43,13 +43,39 @@ def selfjoinCandidate(frequent_Lk, k):
                 candidate = frequent_i.union(frequent_j)
                 candidate_Cm.append(candidate)
 
-    print("found " + str(len(candidate_Cm)) + " candidate itemsets with length m = " + str(m))
+    print("*found " + str(len(candidate_Cm)) + " candidate itemsets with length m = " + str(m))
     return candidate_Cm
 
-# def prune(frequent_Lk, candidate_Cm):
-#     return
+def prune(frequent_Lk, candidate_Cm, m):
+
+    candidate_CmPrune = list()
+    indexSet = set()
+
+    for l in range(len(candidate_Cm)):
+        for candidate_subk in set(itertools.combinations(candidate_Cm[l], m-1)):
+
+            # check if this subset present as an element in list frequent_Lk
+            i = 0
+            while i < len(frequent_Lk):
+
+                if frequent_Lk[i] == set(candidate_subk):
+                    # subset being frequent, check next subset
+                    break
+                i = i + 1
+            if i == len(frequent_Lk) and frequent_Lk[i-1]!= set(candidate_subk):
+                # find infrequent subset
+                indexSet.add(l)
+                break
+    for j in range(len(candidate_Cm)):
+        if indexSet.issuperset({j}) == False:
+            candidate_CmPrune.append(candidate_Cm[j])
+
+    print("*after pruning found " + str(len(candidate_CmPrune)) + " candidates")
+    return candidate_CmPrune
+
 
 def apriori(database, min_support):
+    print("support is set to be "+str(min_support))
     # generate all 204 item candidate set
     candidate_C1 = list()
     for gene in range(100):
@@ -72,11 +98,12 @@ def apriori(database, min_support):
         # m = k + 1
         candidate_Cm = selfjoinCandidate(frequent_Lk, k)
         # add prune function here
-        #candidate_CmPrune = prune(frequent_Lk, candidate_Cm)
-        k = k + 1
-        frequent_Lk = frequent(database, min_support, candidate_Cm, k)
+        candidate_CmPrune = prune(frequent_Lk, candidate_Cm, k+1)
 
-    print("found " + str(len(frequent_L)) + " frequent itemsets in total")
+        k = k + 1
+        frequent_Lk = frequent(database, min_support, candidate_CmPrune, k)
+
+    print("number of all lengths frequent itemsets: " + str(len(frequent_L)))
 
 
 
@@ -86,7 +113,7 @@ def main():
     # for element in database:
     #     print(element)
 
-    frequent_L = apriori(database, 0.7)
+    frequent_L = apriori(database, 0.5)
 
 
 
