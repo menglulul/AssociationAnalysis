@@ -1,5 +1,6 @@
 import re
 import itertools
+import pandas as pd
 
 def read(file_path):
     file_object = open(file_path, "r")
@@ -153,6 +154,21 @@ def print_rules_result(asso_rules):
 
 
 
+def template1(df, rule, num, item_list):   
+    temp_df = pd.DataFrame(columns = item_list)
+    temp_df['result'] = pd.Series(True, index=df.index)
+
+    for item in item_list:
+        if rule == 'RULE':
+            temp_df[item]= df.HEAD.str.contains(item) | df.BODY.str.contains(item)
+        else:
+            temp_df[item]= df[rule].str.contains(item)
+        temp_df['result'] = temp_df[item] & temp_df.result
+    
+    cnt = temp_df.result.value_counts()[0] if num == 'NONE' else temp_df.result.value_counts()[1]
+    return cnt
+
+
 
 def main():
 
@@ -162,8 +178,15 @@ def main():
 
     frequent_L = apriori(database, 0.5)
     conf_rules = rule_generation(database, frequent_L, 0.7)
-    print_rules_result(conf_rules)
+    #print_rules_result(conf_rules)
+    
+    df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
+    df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
+    #print(df)
+    print(template1(df,'RULE',1,['gene82_Down']))
 
+
+    
 
 if __name__ == '__main__':
     main()
