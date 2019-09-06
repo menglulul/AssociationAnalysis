@@ -154,6 +154,11 @@ def print_rules_result(asso_rules):
         print(rule)
 
 
+def intersection(lst1, lst2): 
+    return set(lst1) & set(lst2)
+
+def union(lst1, lst2): 
+    return set(lst1) | set(lst2)
 
 def template1(df, rule, num, item_list):   
     temp_df = pd.DataFrame(columns = item_list)
@@ -166,8 +171,14 @@ def template1(df, rule, num, item_list):
             temp_df[item]= df[rule].str.contains(item)
         temp_df['result'] = temp_df[item] & temp_df.result
     
-    cnt = temp_df.result.value_counts()[0] if num == 'NONE' else temp_df.result.value_counts()[1]
-    return cnt
+    if num == 'NONE':
+        cnt = temp_df.result.value_counts()[0]  
+        result_list = temp_df.index[temp_df['result'] == False].tolist()
+    else:
+        cnt = temp_df.result.value_counts()[1]
+        result_list = temp_df.index[temp_df['result'] == True].tolist()
+        
+    return result_list, cnt
 
 
 def template2(df, rule, num):
@@ -179,7 +190,25 @@ def template2(df, rule, num):
         else:
             temp_df[i] = df.iloc[i][rule].count(', ') + 1
   
-    return temp_df.loc[lambda x : x >= num ].size
+    result = temp_df.loc[lambda x : x >= num ]
+    return result.index.tolist(), result.size
+
+
+def template3(df, query_type, rule1, num1, rule2, num2, item_list1=[], item_list2=[]):
+    combined_result = []
+    
+    if query_type.count('1') == 2:
+        result1, cnt1 = template1(df, rule1, num1, item_list1)
+        result2, cnt2 = template1(df, rule2, num2, item_list2)
+    elif query_type.count('2') == 2:
+        result1, cnt1 = template2(df, rule1, num1)
+        result2, cnt2 = template2(df, rule2, num2)
+    else:
+        result1, cnt1 = template1(df, rule1, num1, item_list1)
+        result2, cnt2 = template2(df, rule2, num2)
+
+    combined_result = union(result1, result2) if query_type.count('or') == 1 else intersection(result1, result2)
+    return len(combined_result)
 
 
 def main():
@@ -194,9 +223,9 @@ def main():
     
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    print(df)
     #print(template1(df,'RULE',1,['gene82_Down']))
-    print(template2(df,'RULE',3))
+    #print(template2(df,'RULE',3))
+    #print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
     
 
