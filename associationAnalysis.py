@@ -1,4 +1,3 @@
-# association analysis homework
 import re
 import itertools
 
@@ -104,6 +103,54 @@ def apriori(database, min_support):
         frequent_Lk = frequent(database, min_support, candidate_CmPrune, k)
 
     print("number of all lengths frequent itemsets: " + str(len(frequent_L)))
+    return frequent_L
+
+
+
+def generate_rules(itemset):
+    # do the first generation of a frequent itemset
+    # ex: for freq_set{a,b,c,d}
+    #     generate{{a,b,c}->{d},{a,b,d}->{c},{a,c,d}->{b},{b,c,d}->{a}}
+    rules = list()
+    for item in itemset:
+        head = {item}
+        body = itemset-head
+        rule = (body,head)
+        rules.append(rule)
+            
+    return rules
+
+def selfjoin_rules(rules):
+    new_rules = list()
+    # to do
+    return new_rules
+
+def prune_rules(rules):
+    new_rules = list()
+    # to do
+    return new_rules
+
+def select_rules(database, rules, min_confidence):
+    high_conf_rules = list()
+    return high_conf_rules
+    
+
+def rule_generation(database, freq_sets, min_confidence):
+    # to do
+    asso_rules = list()
+    for i in freq_sets:
+        if len(i)>1:
+            new_rules = generate_rules(i)
+            asso_rules.append(new_rules)
+        # to do
+    return asso_rules
+                
+
+def print_rules_result(asso_rules):
+    # to do
+    for rule in asso_rules:
+        print(rule)
+
 
 
 
@@ -114,7 +161,8 @@ def main():
     #     print(element)
 
     frequent_L = apriori(database, 0.5)
-
+    conf_rules = rule_generation(database, frequent_L, 0.7)
+    print_rules_result(conf_rules)
 
 
 if __name__ == '__main__':
