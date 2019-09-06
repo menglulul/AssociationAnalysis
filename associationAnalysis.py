@@ -130,11 +130,25 @@ def prune_rules(rules):
     # to do
     return new_rules
 
-def select_rules(database, rules, min_confidence):
+def select_rules(database, candidate_rules, min_confidence):
     high_conf_rules = list()
     # calculate the confidence of each rule
     # if rules have high confidence, put them in the list
-    return rules
+    for cand_rule in candidate_rules:
+        head = cand_rule[0]
+        body = cand_rule[1]
+        unionset = union(head,body)
+        numerator = 0
+        denominator = 0
+        for trans in database:
+            if trans.issuperset(unionset):
+                numerator += 1
+            if trans.issuperset(head):
+                denominator += 1
+        if denominator>0:
+            if numerator/denominator >= min_confidence:
+                high_conf_rules.append(cand_rule)
+    return high_conf_rules
     
 
 def rule_generation(database, freq_sets, min_confidence):
@@ -236,7 +250,7 @@ def main():
     
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    print(template1(df,'RULE',1,['gene82_Down']))
+    #print(template1(df,'RULE',1,['gene82_Down']))
     #print(template2(df,'RULE',3))
     #print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
