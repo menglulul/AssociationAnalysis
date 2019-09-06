@@ -141,7 +141,7 @@ def rule_generation(database, freq_sets, min_confidence):
     for i in freq_sets:
         if len(i)>1:
             new_rules = generate_rules(i)
-            asso_rules.append(new_rules)
+            asso_rules+=new_rules
         # to do
     return asso_rules
                 
