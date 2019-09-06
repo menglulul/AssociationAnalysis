@@ -169,6 +169,17 @@ def template1(df, rule, num, item_list):
     return cnt
 
 
+def template2(df, rule, num):
+    temp_df = pd.Series(0, index=df.index)
+    
+    for i in range(len(temp_df.index)):
+        if rule == 'RULE':
+            temp_df[i] = df.iloc[i].HEAD.count(', ') + df.iloc[i].BODY.count(', ') + 2
+        else:
+            temp_df[i] = df.iloc[i][rule].count(', ') + 1
+  
+    return temp_df.loc[lambda x : x >= num ].size
+
 
 def main():
 
@@ -182,9 +193,9 @@ def main():
     
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    #print(df)
-    print(template1(df,'RULE',1,['gene82_Down']))
-
+    print(df)
+    #print(template1(df,'RULE',1,['gene82_Down']))
+    print(template2(df,'RULE',3))
 
     
 
