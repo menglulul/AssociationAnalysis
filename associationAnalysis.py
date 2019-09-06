@@ -108,17 +108,16 @@ def apriori(database, min_support):
 
 
 
-def generate_rules(itemset):
+def gen_first_rules(itemset):
     # do the first generation of a frequent itemset
     # ex: for freq_set{a,b,c,d}
     #     generate{{a,b,c}->{d},{a,b,d}->{c},{a,c,d}->{b},{b,c,d}->{a}}
     rules = list()
     for item in itemset:
-        head = {item}
-        body = itemset-head
-        rule = (body,head)
+        body = {item}
+        head = itemset-body
+        rule = (head,body)
         rules.append(rule)
-            
     return rules
 
 def selfjoin_rules(rules):
@@ -133,6 +132,8 @@ def prune_rules(rules):
 
 def select_rules(database, rules, min_confidence):
     high_conf_rules = list()
+    # calculate the confidence of each rule
+    # if rules have high confidence, put them in the list
     return high_conf_rules
     
 
@@ -141,8 +142,8 @@ def rule_generation(database, freq_sets, min_confidence):
     asso_rules = list()
     for i in freq_sets:
         if len(i)>1:
-            new_rules = generate_rules(i)
-            asso_rules+=new_rules
+            new_rules = gen_first_rules(i)
+            asso_rules.append(new_rules)
         # to do
     return asso_rules
                 
