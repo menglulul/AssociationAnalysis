@@ -134,17 +134,30 @@ def select_rules(database, rules, min_confidence):
     high_conf_rules = list()
     # calculate the confidence of each rule
     # if rules have high confidence, put them in the list
-    return high_conf_rules
+    return rules
     
 
 def rule_generation(database, freq_sets, min_confidence):
-    # to do
     asso_rules = list()
-    for i in freq_sets:
-        if len(i)>1:
-            new_rules = gen_first_rules(i)
-            asso_rules.append(new_rules)
-        # to do
+    for itemset in freq_sets:
+        n = len(itemset)
+        k = n
+        #generate new rules until last selected rules empty or head size = 1
+        if k>1:
+            cand_rules = gen_first_rules(itemset)
+            new_rules = select_rules(database, cand_rules, min_confidence)
+            asso_rules+=new_rules
+            k=k-1
+            while len(new_rules)>=1 and k>1:
+                cand_rules = selfjoin_rules(new_rules)
+                cand_rules = prune_rules(cand_rules)
+                new_rules = select_rules(database, cand_rules, min_confidence)
+                asso_rules+=new_rules
+                k=k-1
+            
+        for rule in asso_rules:
+            print(rule)
+            
     return asso_rules
                 
 
@@ -223,7 +236,7 @@ def main():
     
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    #print(template1(df,'RULE',1,['gene82_Down']))
+    print(template1(df,'RULE',1,['gene82_Down']))
     #print(template2(df,'RULE',3))
     #print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
