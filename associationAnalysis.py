@@ -122,13 +122,29 @@ def gen_first_rules(itemset):
 
 def selfjoin_rules(rules):
     new_rules = list()
-    # to do
+    for i in range(len(rules)):
+        rule_i = rules[i]
+        if (len(rule_i[0]) > 1):
+            for j in range(i+1, len(rules)):
+                rule_j = rules[j]
+                # join({head1},{body1}),({head2},{body2}) -> ({head1&head2},{body1|body2})
+                if(len(rule_j[0]) > 1 and len(rule_i[0] & rule_j[0]) > 0):
+                    new_rule = (rule_i[0] & rule_j[0], rule_i[1] | (rule_j[1]))
+                    if (new_rule not in new_rules):
+                        new_rules.append(new_rule)
+    print("*generated " + str(len(new_rules)) + " candidate rules with HEAD length  = " + str(len(new_rules[0][0])))
     return new_rules
 
-def prune_rules(rules):
-    new_rules = list()
-    # to do
-    return new_rules
+def prune_rules(rules, prev_rules):
+    for rule in rules:
+        (head, body) = rule
+        for item in body:
+            parent_rule = (head | {item}, body - {item})
+            if (parent_rule not in prev_rules):
+                rules.remove(rule)
+                break
+    print("*after pruning found " + str(len(rules)) + " candidate rules" )
+    return rules
 
 def select_rules(database, candidate_rules, min_confidence):
     high_conf_rules = list()
@@ -164,7 +180,7 @@ def rule_generation(database, freq_sets, min_confidence):
             k=k-1
             while len(new_rules)>=1 and k>1:
                 cand_rules = selfjoin_rules(new_rules)
-                cand_rules = prune_rules(cand_rules)
+                cand_rules = prune_rules(cand_rules, new_rules)
                 new_rules = select_rules(database, cand_rules, min_confidence)
                 asso_rules+=new_rules
                 k=k-1
