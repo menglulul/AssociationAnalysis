@@ -185,8 +185,8 @@ def rule_generation(database, freq_sets, min_confidence):
                 asso_rules+=new_rules
                 k=k-1
             
-        for rule in asso_rules:
-            print(rule)
+        #for rule in asso_rules:
+            #print(rule)
             
     return asso_rules
                 
@@ -203,25 +203,25 @@ def intersection(lst1, lst2):
 def union(lst1, lst2): 
     return set(lst1) | set(lst2)
 
+
 def template1(df, rule, num, item_list):   
     temp_df = pd.DataFrame(columns = item_list)
-    temp_df['result'] = pd.Series(True, index=df.index)
+    temp_df['result'] = pd.Series(0, index=df.index)
 
     for item in item_list:
         if rule == 'RULE':
             temp_df[item]= df.HEAD.str.contains(item) | df.BODY.str.contains(item)
         else:
             temp_df[item]= df[rule].str.contains(item)
-        temp_df['result'] = temp_df[item] & temp_df.result
-    
+        temp_df['result'] += temp_df[item]
+    #print(temp_df)      
     if num == 'NONE':
-        cnt = temp_df.result.value_counts()[0]  
-        result_list = temp_df.index[temp_df['result'] == False].tolist()
+        result_list = temp_df.index[temp_df['result'] == 0].tolist()
+    elif num == 'ANY':
+        result_list = temp_df.index[temp_df['result'] >= 1].tolist()
     else:
-        cnt = temp_df.result.value_counts()[1]
-        result_list = temp_df.index[temp_df['result'] == True].tolist()
-        
-    return result_list, cnt
+        result_list = temp_df.index[temp_df['result'] == num].tolist()       
+    return result_list, len(result_list)
 
 
 def template2(df, rule, num):
@@ -266,7 +266,7 @@ def main():
     
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    #print(template1(df,'RULE',1,['gene82_Down']))
+    #print(template1(df,'RULE','ANY',['gene59_Up']))
     #print(template2(df,'RULE',3))
     #print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
