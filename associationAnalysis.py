@@ -247,6 +247,33 @@ def template3(df, query_type, rule1, num1, rule2, num2, item_list1=[], item_list
     combined_result = union(result1, result2) if query_type.count('or') == 1 else intersection(result1, result2)
     return len(combined_result)
 
+def gen_task_2(df):
+        
+   # template1 results
+    
+    print(template1(df,'RULE', 'ANY', ['gene59_Up']))
+    print(template1(df,'RULE', 'NONE', ['gene59_Up']))
+    print(template1(df,'RULE', 1, ['gene59_Up','gene10_Down']))
+    print(template1(df,'HEAD', 'ANY', ['gene59_Up']))
+    print(template1(df,'HEAD', 'NONE', ['gene59_Up']))
+    print(template1(df,'HEAD',  1, ['gene59_Up','gene10_Down']))
+    print(template1(df,'BODY', 'ANY', ['gene59_Up']))
+    print(template1(df,'BODY', 'NONE', ['gene59_Up']))
+    print(template1(df,'BODY',  1, ['gene59_Up','gene10_Down']))
+    
+    #template2 results
+    
+    print(template2(df,'RULE',3))
+    print(template2(df,'HEAD',2))
+    print(template2(df,'BODY',1))
+    
+    #template3 results
+    print(template3(df,'1or1','HEAD','ANY','BODY',1,['gene10_Down'],['gene59_Up']))
+    print(template3(df,'1and1','HEAD','ANY','BODY',1,['gene10_Down'],['gene59_Up']))
+    print(template3(df,'1or2','HEAD','ANY','BODY',2,['gene10_Down']))
+    print(template3(df,'1and2','HEAD','ANY','BODY',2,['gene10_Down']))
+    print(template3(df,'2or2','HEAD',1,'BODY',2))
+    print(template3(df,'2and2','HEAD',1,'BODY',2))
 
 def main():
 
@@ -265,7 +292,7 @@ def main():
     print(template2(df,'RULE',3))
     print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
-    
+    gen_task_2(df)
 
 if __name__ == '__main__':
     main()
