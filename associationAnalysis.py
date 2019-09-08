@@ -25,7 +25,8 @@ def frequent(database, min_support, candidate_Ck, k):
             frequent_Lk.append(candidate)
         cnt = 0
 
-    print("number of length-" + str(k) + " frequent itemsets:"+str(len(frequent_Lk)))
+    if len(frequent_Lk) != 0:
+        print("number of length-" + str(k) + " frequent itemsets:"+str(len(frequent_Lk)))
     return frequent_Lk
 
 
@@ -43,7 +44,7 @@ def selfjoinCandidate(frequent_Lk, k):
                 candidate = frequent_i.union(frequent_j)
                 candidate_Cm.append(candidate)
 
-    print("*found " + str(len(candidate_Cm)) + " candidate itemsets with length m = " + str(m))
+    #print("*found " + str(len(candidate_Cm)) + " candidate itemsets with length m = " + str(m))
     return candidate_Cm
 
 def prune(frequent_Lk, candidate_Cm, m):
@@ -55,27 +56,20 @@ def prune(frequent_Lk, candidate_Cm, m):
         for candidate_subk in set(itertools.combinations(candidate_Cm[l], m-1)):
 
             # check if this subset present as an element in list frequent_Lk
-            i = 0
-            while i < len(frequent_Lk):
-
-                if frequent_Lk[i] == set(candidate_subk):
-                    # subset being frequent, check next subset
-                    break
-                i = i + 1
-            if i == len(frequent_Lk) and frequent_Lk[i-1]!= set(candidate_subk):
-                # find infrequent subset
+            if set(candidate_subk) not in frequent_Lk:
                 indexSet.add(l)
                 break
+
     for j in range(len(candidate_Cm)):
         if indexSet.issuperset({j}) == False:
             candidate_CmPrune.append(candidate_Cm[j])
 
-    print("*after pruning found " + str(len(candidate_CmPrune)) + " candidates")
+    #print("*after pruning found " + str(len(candidate_CmPrune)) + " candidates")
     return candidate_CmPrune
 
 
-def apriori(database, min_support):
-    print("support is set to be "+str(min_support))
+def frequent_generation(database, min_support):
+    print("Support is set to be "+str(min_support))
     # generate all 204 item candidate set
     candidate_C1 = list()
     for gene in range(100):
@@ -260,15 +254,16 @@ def main():
     # for element in database:
     #     print(element)
 
-    frequent_L = apriori(database, 0.5)
+    # apriori algorithm for frequent item mining and association rule learning
+    frequent_L = frequent_generation(database, 0.5)
     conf_rules = rule_generation(database, frequent_L, 0.7)
-    #print_rules_result(conf_rules)
-    
+    print_rules_result(conf_rules)
+
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    #print(template1(df,'RULE','ANY',['gene59_Up']))
-    #print(template2(df,'RULE',3))
-    #print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
+    print(template1(df,'RULE','ANY',['gene59_Up']))
+    print(template2(df,'RULE',3))
+    print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
 
     
 
