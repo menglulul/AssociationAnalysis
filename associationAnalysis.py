@@ -130,15 +130,20 @@ def selfjoin_rules(rules):
     return new_rules
 
 def prune_rules(rules, prev_rules):
-    for rule in rules:
-        (head, body) = rule
+    rules_pruned = list()
+    for i in range(len(rules)):
+        (head, body) = rules[i]
         for item in body:
             parent_rule = (head | {item}, body - {item})
             if (parent_rule not in prev_rules):
-                rules.remove(rule)
+                rules_pruned.append(i)
                 break
-    print("*after pruning found " + str(len(rules)) + " candidate rules" )
-    return rules
+    new_rules = list()
+    for i in range(len(rules)):
+        if (i not in rules_pruned):
+            new_rules.append(rules[i])
+    print("*after pruning found " + str(len(new_rules)) + " candidate rules" )
+    return new_rules
 
 def select_rules(database, candidate_rules, min_confidence):
     high_conf_rules = list()
