@@ -121,8 +121,10 @@ def selfjoin_rules(rules):
         if (len(rule_i[0]) > 1):
             for j in range(i+1, len(rules)):
                 rule_j = rules[j]
+                # check prefix of rule conseuqnt
+                have_common_prefix = sorted(rule_i[1])[:-1] == sorted(rule_j[1])[:-1]
                 # join({head1},{body1}),({head2},{body2}) -> ({head1&head2},{body1|body2})
-                if(len(rule_j[0]) > 1 and len(rule_i[0] & rule_j[0]) > 0):
+                if(len(rule_j[0]) > 1 and have_common_prefix and len(rule_i[0] & rule_j[0]) > 0):
                     new_rule = (rule_i[0] & rule_j[0], rule_i[1] | (rule_j[1]))
                     if (new_rule not in new_rules):
                         new_rules.append(new_rule)
