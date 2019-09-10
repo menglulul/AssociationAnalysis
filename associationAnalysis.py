@@ -204,6 +204,12 @@ def intersection(lst1, lst2):
 def union(lst1, lst2): 
     return set(lst1) | set(lst2)
 
+def print_template(df, result):
+    for i in result:
+        temp = df.loc[i,:]
+        head = temp.HEAD.replace('{', '').replace('}', '').replace("'", '')
+        body = temp.BODY.replace('{', '').replace('}', '').replace("'", '')
+        print('('+ head + ') --> '+ body)
 
 def template1(df, rule, num, item_list):   
     temp_df = pd.DataFrame(columns = item_list)
@@ -252,7 +258,9 @@ def template3(df, query_type, rule1, num1, rule2, num2, item_list1=[], item_list
         result2, cnt2 = template2(df, rule2, num2)
 
     combined_result = union(result1, result2) if query_type.count('or') == 1 else intersection(result1, result2)
-    return len(combined_result)
+    print_template(df, combined_result)
+    return combined_result, len(combined_result)
+
 
 def gen_task_2(df):
         
@@ -295,11 +303,12 @@ def main():
 
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    print(template1(df,'RULE','ANY',['gene59_Up']))
-    print(template2(df,'RULE',3))
-    print(template3(df,'1and2','RULE',1,'RULE',3,['gene82_Down']))
+    #print(template1(df,'RULE','ANY',['gene59_Up']))
+    #print(template2(df,'RULE',3))
+    #print('========================')
+    #print(template3(df,'1or2','RULE',1,'RULE',3,['gene82_Down']))
 
-    gen_task_2(df)
+   #en_task_2(df)
 
 if __name__ == '__main__':
     main()
