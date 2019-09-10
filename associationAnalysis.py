@@ -128,7 +128,7 @@ def selfjoin_rules(rules):
                     new_rule = (rule_i[0] & rule_j[0], rule_i[1] | (rule_j[1]))
                     if (new_rule not in new_rules):
                         new_rules.append(new_rule)
-    print("*generated " + str(len(new_rules)) + " candidate rules with HEAD length  = " + str(len(new_rules[0][0])))
+    #print("*generated " + str(len(new_rules)) + " candidate rules with HEAD length  = " + str(len(new_rules[0][0])))
     return new_rules
 
 def prune_rules(rules, prev_rules):
@@ -144,7 +144,7 @@ def prune_rules(rules, prev_rules):
     for i in range(len(rules)):
         if (i not in rules_pruned):
             new_rules.append(rules[i])
-    print("*after pruning found " + str(len(new_rules)) + " candidate rules" )
+    #print("*after pruning found " + str(len(new_rules)) + " candidate rules" )
     return new_rules
 
 def select_rules(database, candidate_rules, min_confidence):
@@ -227,7 +227,8 @@ def template1(df, rule, num, item_list):
     elif num == 'ANY':
         result_list = temp_df.index[temp_df['result'] >= 1].tolist()
     else:
-        result_list = temp_df.index[temp_df['result'] == num].tolist()       
+        result_list = temp_df.index[temp_df['result'] == num].tolist()
+    print_template(df, result_list)
     return result_list, len(result_list)
 
 
@@ -241,6 +242,7 @@ def template2(df, rule, num):
             temp_df[i] = df.iloc[i][rule].count(', ') + 1
   
     result = temp_df.loc[lambda x : x >= num ]
+    print_template(df, result)
     return result.index.tolist(), result.size
 
 
@@ -265,50 +267,62 @@ def template3(df, query_type, rule1, num1, rule2, num2, item_list1=[], item_list
 def gen_task_2(df):
         
    # template1 results
-    
+    print('========================')
     print(template1(df,'RULE', 'ANY', ['gene59_Up']))
+    print('========================')
     print(template1(df,'RULE', 'NONE', ['gene59_Up']))
+    print('========================')
     print(template1(df,'RULE', 1, ['gene59_Up','gene10_Down']))
+
+
+    print('========================')
     print(template1(df,'HEAD', 'ANY', ['gene59_Up']))
+    print('========================')
     print(template1(df,'HEAD', 'NONE', ['gene59_Up']))
+    print('========================')
     print(template1(df,'HEAD',  1, ['gene59_Up','gene10_Down']))
+    print('========================')
     print(template1(df,'BODY', 'ANY', ['gene59_Up']))
+    print('========================')
     print(template1(df,'BODY', 'NONE', ['gene59_Up']))
+    print('========================')
     print(template1(df,'BODY',  1, ['gene59_Up','gene10_Down']))
+    print('========================')
     
     #template2 results
-    
+    print('========================')
     print(template2(df,'RULE',3))
+    print('========================')
     print(template2(df,'HEAD',2))
+    print('========================')
     print(template2(df,'BODY',1))
-    
+
     #template3 results
+    print('========================')
     print(template3(df,'1or1','HEAD','ANY','BODY',1,['gene10_Down'],['gene59_Up']))
+    print('========================')
     print(template3(df,'1and1','HEAD','ANY','BODY',1,['gene10_Down'],['gene59_Up']))
+    print('========================')
     print(template3(df,'1or2','HEAD','ANY','BODY',2,['gene10_Down']))
+    print('========================')
     print(template3(df,'1and2','HEAD','ANY','BODY',2,['gene10_Down']))
+    print('========================')
     print(template3(df,'2or2','HEAD',1,'BODY',2))
+    print('========================')
     print(template3(df,'2and2','HEAD',1,'BODY',2))
 
 def main():
 
     database = read("./associationruletestdata.txt")
-    # for element in database:
-    #     print(element)
 
     # apriori algorithm for frequent item mining and association rule learning
     frequent_L = frequent_generation(database, 0.5)
     conf_rules = rule_generation(database, frequent_L, 0.7)
-    print_rules_result(conf_rules)
 
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-    #print(template1(df,'RULE','ANY',['gene59_Up']))
-    #print(template2(df,'RULE',3))
-    #print('========================')
-    #print(template3(df,'1or2','RULE',1,'RULE',3,['gene82_Down']))
 
-   #en_task_2(df)
+    gen_task_2(df)
 
 if __name__ == '__main__':
     main()
