@@ -313,16 +313,26 @@ def gen_task_2(df):
 
 def main():
 
+    # refer to the dataset path here
     database = read("./associationruletestdata.txt")
 
-    # apriori algorithm for frequent item mining and association rule learning
+    # apriori algorithm for frequent itemset mining that takes in the read database and minimum support
     frequent_L = frequent_generation(database, 0.5)
+
+    # confident rule mining that takes in the read database, the frequent itemsets and minimum confidence
     conf_rules = rule_generation(database, frequent_L, 0.7)
 
+    # data frame of pandas package that helps produce output based on 3 templates
+    # (3 template functions being called in gen_task_2)
     df = pd.DataFrame(conf_rules, columns = ['HEAD','BODY'])
     df[['HEAD','BODY']] = df[['HEAD','BODY']].astype(str)
-
     gen_task_2(df)
+
+    # the following are example commands to run output from 3 templates
+    # please uncomment the commands and modify the arguments for trying out different restrictions on rule mining
+    # print(template1(df, 'RULE', 'ANY', ['gene59_Up']))
+    # print(template2(df, 'RULE', 3))
+    # print(template3(df, '1or1', 'HEAD', 'ANY', 'BODY', 1, ['gene10_Down'], ['gene59_Up']))
 
 if __name__ == '__main__':
     main()
